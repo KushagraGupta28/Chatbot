@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoneyChoice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #0a1f12 0%, #0d2818 50%, #0f2e1a 100%);
+      color: #e8f5e9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 540px;
+      height: 92vh;
+      max-height: 720px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(27, 61, 36, 0.95) 0%, rgba(22, 48, 30, 0.98) 100%);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(76, 175, 80, 0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .header-logo {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .header-title {
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: #c8e6c9;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-wrap {
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+    }
+
+    .welcome {
+      font-size: 1.2rem;
+      color: #c8e6c9;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .welcome-sub {
+      font-size: 0.9rem;
+      color: #81c784;
+      margin-top: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: 0 1.25rem 1.5rem;
+    }
+
+    .buttons.hidden {
+      display: none;
+    }
+
+    #financeSubcategories {
+      display: none;
+      flex-direction: column;
+      padding: 0;
+      gap: 0;
+      flex: 1;
+      height: 100%;
+      min-height: 0;
+    }
+
+    #financeSubcategories.hidden {
+      display: none;
+    }
+
+    #financeSubcategories:not(.hidden) {
+      display: flex;
+    }
+
+    .finance-header {
+      padding: 0.6rem 1.25rem;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+      flex-shrink: 0;
+    }
+
+    .finance-header .header-text {
+      color: #a5d6a7;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .finance-subcategories-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .btn-topic {
+      padding: 1.1rem 1.25rem;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.02rem;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      background: rgba(46, 92, 52, 0.7);
+      color: #e8f5e9;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      font-weight: 500;
+    }
+
+    .btn-topic:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(46, 92, 52, 0.4);
+    }
+
+    .btn-topic:active {
+      transform: translateY(0);
+    }
+
+    .btn-topic .btn-emoji {
+      font-size: 1.6rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .btn-topic.finance {
+      border-left: 4px solid #66bb6a;
+    }
+
+    .btn-topic.finance:hover {
+      background: rgba(61, 122, 69, 0.85);
+    }
+
+    .btn-topic.app {
+      border-left: 4px solid #ffb74d;
+    }
+
+    .btn-topic.app:hover {
+      background: rgba(61, 122, 69, 0.85);
+    }
+
+    .btn-topic.general {
+      border-left: 4px solid #81c784;
+    }
+
+    .btn-topic.general:hover {
+      background: rgba(61, 122, 69, 0.85);
+    }
+
+    .chat-section {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-section.visible {
+      display: flex;
+    }
+
+    .topic-bar {
+      padding: 0.6rem 1.25rem;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+    }
+
+    .topic-bar .topic-text {
+      color: #a5d6a7;
+      font-weight: 500;
+    }
+
+    .btn-switch {
+      padding: 0.5rem 0.9rem;
+      border: 1px solid rgba(76, 175, 80, 0.5);
+      border-radius: 10px;
+      background: rgba(76, 175, 80, 0.1);
+      color: #81c784;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-switch:hover {
+      background: rgba(76, 175, 80, 0.2);
+      transform: scale(1.02);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #81c784;
+      padding: 0.4rem 1.25rem 0.5rem;
+      opacity: 0.9;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .msg {
+      max-width: 88%;
+      padding: 0.9rem 1.1rem;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2e5c34 0%, #1e4624 100%);
+      color: #e8f5e9;
+      border: 1px solid rgba(76, 175, 80, 0.35);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      background: rgba(36, 61, 40, 0.9);
+      border: 1px solid rgba(76, 175, 80, 0.25);
+      color: #c8e6c9;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .msg .agent-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #81c784;
+    }
+
+    .input-row {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(76, 175, 80, 0.2);
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 0.85rem 1.1rem;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      border-radius: 12px;
+      background: rgba(46, 92, 52, 0.4);
+      color: #e8f5e9;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-row input::placeholder {
+      color: #81c784;
+      opacity: 0.8;
+    }
+
+    .input-row input:focus {
+      outline: none;
+      border-color: #66bb6a;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    }
+
+    .input-row button {
+      padding: 0.85rem 1.35rem;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+      color: #0d2818;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+    }
+
+    .input-row button:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 4px 14px rgba(76, 175, 80, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .input-row button:active {
+      transform: translateY(0);
+    }
+
+    .input-row button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <img src="/logo.png" alt="MoneyChoice" class="header-logo" onerror="this.style.display='none'">
+      <span class="header-title">MoneyChoice</span>
+    </header>
+    <div class="welcome-wrap">
+      <p class="welcome">Hi 👋 How can I help you today?</p>
+      <p class="welcome-sub">Choose a topic below to get started</p>
+    </div>
+    <div class="buttons" id="buttons">
+      <button type="button" class="btn-topic finance" data-agent="finance">
+        <span class="btn-emoji">📈💰</span>
+        <span>Finance & Market Questions</span>
+      </button>
+      <button type="button" class="btn-topic app" data-agent="app">
+        <span class="btn-emoji">🛠️📱</span>
+        <span>App / Website Issues</span>
+      </button>
+      <button type="button" class="btn-topic general" data-agent="general">
+        <span class="btn-emoji">💬✨</span>
+        <span>General Questions</span>
+      </button>
+    </div>
+    <div class="buttons hidden" id="financeSubcategories">
+      <div class="finance-header">
+        <span class="header-text">Select Finance Topic</span>
+        <button type="button" class="btn-switch" id="btnSwitchFinance">🔄 Back</button>
+      </div>
+      <div class="finance-subcategories-container">
+        <button type="button" class="btn-topic finance" data-agent="finance_indicators_signals">
+          <span class="btn-emoji">📊</span>
+          <span>Indicators & Signals</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_particular_stock">
+          <span class="btn-emoji">📈</span>
+          <span>Particular Stock</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_market_basics">
+          <span class="btn-emoji">📚</span>
+          <span>Market Basics</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_trading_strategies">
+          <span class="btn-emoji">⚔️</span>
+          <span>Trading Strategies</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_risk_management">
+          <span class="btn-emoji">🛡️</span>
+          <span>Risk Management</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_news_impact">
+          <span class="btn-emoji">📰</span>
+          <span>News Impact</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_investment_options">
+          <span class="btn-emoji">💎</span>
+          <span>Investment Options</span>
+        </button>
+        <button type="button" class="btn-topic finance" data-agent="finance_ask_your_own">
+          <span class="btn-emoji">❓</span>
+          <span>Ask Your Own Question</span>
+        </button>
+      </div>
+    </div>
+    <div class="chat-section" id="chatSection">
+      <div class="topic-bar">
+        <span class="topic-text" id="topicLabel">Chatting with: General</span>
+        <button type="button" class="btn-switch" id="btnSwitch">🔄 Switch topic</button>
+      </div>
+      <p class="hint">If this isn’t what you meant, you can switch topics anytime.</p>
+      <div class="messages" id="messages"></div>
+      <div class="input-row">
+        <input type="text" id="input" placeholder="Type your message..." autocomplete="off">
+        <button type="button" id="send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const buttons = document.getElementById('buttons');
+    const financeSubcategories = document.getElementById('financeSubcategories');
+    const chatSection = document.getElementById('chatSection');
+    const topicLabel = document.getElementById('topicLabel');
+    const btnSwitch = document.getElementById('btnSwitch');
+    const btnSwitchFinance = document.getElementById('btnSwitchFinance');
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+
+    let activeAgent = null;
+    let sessionId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 's-' + Date.now();
+    let runId = '';
+    const labels = {
+      finance: 'Finance Expert',
+      app: 'App Expert',
+      general: 'General',
+      finance_indicators_signals: 'Indicators & Signals Expert',
+      finance_particular_stock: 'Stock Analyst',
+      finance_market_basics: 'Market Basics Educator',
+      finance_trading_strategies: 'Trading Strategies Expert',
+      finance_risk_management: 'Risk Management Advisor',
+      finance_news_impact: 'News & Impact Analyst',
+      finance_investment_options: 'Investment Options Guide',
+      finance_ask_your_own: 'Finance Expert',
+    };
+
+    function showTopicChoice() {
+      activeAgent = null;
+      buttons.classList.remove('hidden');
+      financeSubcategories.classList.add('hidden');
+      chatSection.classList.remove('visible');
+      document.querySelector('.welcome-wrap').style.display = 'block';
+    }
+
+    function showFinanceSubcategories() {
+      buttons.classList.add('hidden');
+      financeSubcategories.classList.remove('hidden');
+      chatSection.classList.remove('visible');
+      document.querySelector('.welcome-wrap').style.display = 'none';
+    }
+
+    function chooseTopic(agent) {
+      activeAgent = agent;
+      buttons.classList.add('hidden');
+      financeSubcategories.classList.add('hidden');
+      chatSection.classList.add('visible');
+      topicLabel.textContent = 'Chatting with: ' + labels[agent];
+      messages.innerHTML = '';
+      input.focus();
+    }
+
+    function addMessage(text, isUser, agent) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isUser ? 'user' : 'bot');
+      if (isUser) {
+        div.textContent = text;
+      } else {
+        div.innerHTML = '<div class="agent-label">' + (agent || '') + '</div>' + escapeHtml(text);
+      }
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function setLoading(loading) {
+      sendBtn.disabled = loading;
+      sendBtn.textContent = loading ? '...' : 'Send';
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text || !activeAgent) return;
+      input.value = '';
+      addMessage(text, true);
+      setLoading(true);
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, active_agent: activeAgent, session_id: sessionId, run_id: runId })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.session_id) sessionId = data.session_id;
+          if (data.run_id) runId = data.run_id;
+          addMessage(data.response, false, data.agent + ' –');
+        } else {
+          addMessage('Error: ' + (data.error || res.status), false, '');
+        }
+      } catch (e) {
+        addMessage('Network error. Is the server running?', false, '');
+      }
+      setLoading(false);
+      input.focus();
+    }
+
+    // Main category buttons
+    buttons.querySelectorAll('.btn-topic').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const agent = btn.dataset.agent;
+        if (agent === 'finance') {
+          showFinanceSubcategories();
+        } else {
+          chooseTopic(agent);
+        }
+      });
+    });
+
+    // Finance subcategory buttons
+    financeSubcategories.querySelectorAll('.btn-topic').forEach(btn => {
+      btn.addEventListener('click', () => chooseTopic(btn.dataset.agent));
+    });
+
+    // Switch button - go back to main menu
+    btnSwitch.addEventListener('click', showTopicChoice);
+
+    // Switch button on finance subcategories - back to main menu
+    btnSwitchFinance.addEventListener('click', showTopicChoice);
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+  </script>
+</body>
+
+</html>
